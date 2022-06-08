@@ -1,21 +1,39 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
-	_ "image/jpeg"
+	"io/ioutil"
+	"log"
 	"math"
 	"os"
+	"strings"
 
 	"github.com/ohlrogge/instasquare/openImage"
 )
 
 func main() {
-	var path = "samples/sample.jpg"
+	// var path = "samples/sample.jpg"
 
-	generateSquareImage(path)
+	mydir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	files, err := ioutil.ReadDir(mydir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".jpeg") || strings.HasSuffix(file.Name(), ".jpg") {
+			fmt.Println("Squaring " + file.Name())
+			generateSquareImage(file.Name())
+		}
+	}
 }
 
 func generateSquareImage(path string) {
@@ -33,7 +51,7 @@ func generateSquareImage(path string) {
 	// Overlay image on the canvas
 	draw.Draw(squaredCanvas, squaredCanvas.Bounds(), img, getStartingPoint(img), draw.Src)
 
-	squareJpeg, _ := os.Create("samples/output.jpg")
+	squareJpeg, _ := os.Create("square_" + path)
 	jpeg.Encode(squareJpeg, squaredCanvas, &jpeg.Options{Quality: 90})
 }
 

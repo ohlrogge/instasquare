@@ -23,7 +23,6 @@ func OpenJpeg(path string) (image.Image, error) {
 		return nil, err
 	}
 
-	fmt.Println(file.Name() + " opened")
 	img, format, err := image.Decode(file)
 
 	if isError(err) {
