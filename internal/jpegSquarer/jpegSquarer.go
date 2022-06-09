@@ -40,6 +40,13 @@ func makeJpegSquare(file fs.FileInfo) {
 }
 
 func generateJPEG(fileName string, squaredCanvas *image.RGBA) {
-	squareJpeg, _ := os.Create("square_" + fileName)
+	squareJpeg, err := os.Create("square_" + fileName)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer squareJpeg.Close()
+
 	jpeg.Encode(squareJpeg, squaredCanvas, &jpeg.Options{Quality: 90})
 }
