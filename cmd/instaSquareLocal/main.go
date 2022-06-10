@@ -15,5 +15,7 @@ func main() {
 		fmt.Println(err)
 	}
 
+	fmt.Println(directory)
+
 	jpegSquarer.ConvertAllJpegsFromDirectory(directory)
 }
