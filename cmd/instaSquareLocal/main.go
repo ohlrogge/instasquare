@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ohlrogge/instasquare/internal/jpegSquarer"
+	"github.com/ohlrogge/instasquare/internal/square"
 )
 
 func main() {
@@ -17,5 +17,5 @@ func main() {
 
 	fmt.Println(directory)
 
-	jpegSquarer.ConvertAllJpegsFromDirectory(directory)
+	square.ConvertAllJpegsFromDirectory(directory)
 }

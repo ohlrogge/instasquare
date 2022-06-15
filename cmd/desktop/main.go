@@ -11,7 +11,10 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"github.com/ohlrogge/instasquare/internal/square"
 )
+
+var imageDirectory string
 
 func main() {
 	myApp := app.New()
@@ -23,7 +26,9 @@ func main() {
 	text1 := canvas.NewText("Open folder", green)
 	buttonFolder := widget.NewButton("Open Folder", func() {
 		fmt.Println("Open folder tapped.")
-		fmt.Println(openFolderDialog(myWindow))
+		directory := openFolderDialog(myWindow)
+		fmt.Println("Here" + directory)
+		// square.ConvertAllJpegsFromDirectory(directory)
 	})
 
 	content := container.NewGridWithRows(2, text1, buttonFolder)
@@ -33,6 +38,7 @@ func main() {
 }
 
 func openFolderDialog(win fyne.Window) (directory string) {
+
 	dialog.ShowFolderOpen(func(dir fyne.ListableURI, err error) {
 		if err != nil {
 			dialog.ShowError(err, win)
@@ -48,15 +54,15 @@ func openFolderDialog(win fyne.Window) (directory string) {
 			return
 		}
 
-		directory = strings.TrimPrefix(dir.String(), "file://")
+		imageDirectory = strings.TrimPrefix(dir.String(), "file://")
 
-		fmt.Println(directory)
+		fmt.Println(imageDirectory)
 
-		// jpegSquarer.ConvertAllJpegsFromDirectory(directory)
+		square.ConvertAllJpegsFromDirectory(imageDirectory)
 
 		dialog.ShowInformation("Folder Open", directory, win)
 	}, win)
 
-	return directory
+	return imageDirectory
 
 }
