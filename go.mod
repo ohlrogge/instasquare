@@ -4,7 +4,11 @@ go 1.18
 
 require github.com/zserge/lorca v0.1.10
 
-require github.com/fyne-io/mobile v0.1.2 // indirect
+require (
+	github.com/disintegration/gift v1.1.2 // indirect
+	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec // indirect
+	github.com/fyne-io/mobile v0.1.2 // indirect
+)
 
 require (
 	fyne.io/fyne v1.4.3

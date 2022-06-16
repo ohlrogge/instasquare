@@ -1,18 +1,25 @@
 package square
 
 import (
-	"errors"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
+	"image/png"
 	"log"
 	"math"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/disintegration/imageorient"
 )
+
+type img struct {
+	squarepath   string
+	filetype     string
+	orignalimage image.Image
+}
 
 func ConvertAllJpegsFromDirectory(directory string) {
 	files, err := os.ReadDir(directory)
@@ -22,38 +29,42 @@ func ConvertAllJpegsFromDirectory(directory string) {
 	}
 
 	for _, file := range files {
-		if strings.HasSuffix(file.Name(), ".jpeg") || strings.HasSuffix(file.Name(), ".jpg") {
-			makeJpegSquare(filepath.Join(directory, file.Name()))
+		ext := filepath.Ext(file.Name())
+		if ext == ".jpeg" || ext == ".jpg" || ext == ".png" {
+			i := img{
+				squarepath:   filepath.Join(directory, "square_"+file.Name()),
+				filetype:     filepath.Ext(file.Name()),
+				orignalimage: openImage(filepath.Join(directory, file.Name())),
+			}
+			createsquareimage(i)
 		}
 	}
 }
 
-func makeJpegSquare(file string) {
-	fmt.Println(file)
+func createsquareimage(i img) {
 
-	img, err := openJpeg(file)
+	squareimg := generatesquareimage(i.orignalimage)
+	generatenewfile(i, squareimg)
+}
+
+func generatenewfile(i img, squareimg *image.RGBA) {
+	fmt.Println("Generating" + i.squarepath)
+	f, err := os.Create(i.squarepath)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	squareImage := generateSquareImage(img)
-	generateJPEG(file, squareImage)
-}
+	defer f.Close()
 
-func generateJPEG(fileName string, squaredCanvas *image.RGBA) {
-	squareJpeg, err := os.Create(fileName + "_square.jpg")
-
-	if err != nil {
-		fmt.Println(err)
+	if i.filetype == ".jpeg" || i.filetype == ".jpg" {
+		jpeg.Encode(f, squareimg, &jpeg.Options{Quality: 90})
+	} else if i.filetype == ".png" {
+		png.Encode(f, squareimg)
 	}
-
-	defer squareJpeg.Close()
-
-	jpeg.Encode(squareJpeg, squaredCanvas, &jpeg.Options{Quality: 90})
 }
 
-func generateSquareImage(img image.Image) *image.RGBA {
+func generatesquareimage(img image.Image) *image.RGBA {
 
 	squareSideLength := getSquareSideLength(img.Bounds())
 
@@ -95,24 +106,19 @@ func isError(err error) bool {
 	return (err != nil)
 }
 
-func openJpeg(path string) (image.Image, error) {
+func openImage(path string) image.Image {
 
-	var file, err = os.Open(path)
-
-	if isError(err) {
-		return nil, err
-	}
-
-	img, format, err := image.Decode(file)
+	f, err := os.Open(path)
 
 	if isError(err) {
-		return nil, err
+		log.Fatalf("os.Open failed: %v", err)
 	}
 
-	if format != "jpeg" {
-		fmt.Println("Image format is not jpeg.")
-		return nil, errors.New("image format is not jpeg")
+	img, _, err := imageorient.Decode(f)
+
+	if isError(err) {
+		log.Fatalf("imageorient.Decode failed: %v", err)
 	}
 
-	return img, nil
+	return img
 }
