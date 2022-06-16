@@ -17,5 +17,5 @@ func main() {
 
 	fmt.Println(directory)
 
-	square.ConvertAllJpegsFromDirectory(directory)
+	square.GenerateAll(directory)
 }

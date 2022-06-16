@@ -18,17 +18,14 @@ var imageDirectory string
 
 func main() {
 	myApp := app.New()
-	myWindow := myApp.NewWindow("Widget")
+	myWindow := myApp.NewWindow("instasquare")
 	myWindow.Resize(fyne.NewSize(768, 460))
 
-	green := color.NRGBA{R: 0, G: 180, B: 0, A: 255}
+	white := color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 
-	text1 := canvas.NewText("Open folder", green)
+	text1 := canvas.NewText("To square all images in a folder, open it.", white)
 	buttonFolder := widget.NewButton("Open Folder", func() {
-		fmt.Println("Open folder tapped.")
-		directory := openFolderDialog(myWindow)
-		fmt.Println("Here" + directory)
-		// square.ConvertAllJpegsFromDirectory(directory)
+		openFolderDialog(myWindow)
 	})
 
 	content := container.NewGridWithRows(2, text1, buttonFolder)
@@ -56,11 +53,9 @@ func openFolderDialog(win fyne.Window) (directory string) {
 
 		imageDirectory = strings.TrimPrefix(dir.String(), "file://")
 
-		fmt.Println(imageDirectory)
+		square.GenerateAll(imageDirectory)
 
-		square.ConvertAllJpegsFromDirectory(imageDirectory)
-
-		dialog.ShowInformation("Folder Open", directory, win)
+		dialog.ShowInformation("Folder Open", "All images squared from "+imageDirectory, win)
 	}, win)
 
 	return imageDirectory

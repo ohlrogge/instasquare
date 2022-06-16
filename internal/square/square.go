@@ -21,7 +21,7 @@ type img struct {
 	orignalimage image.Image
 }
 
-func ConvertAllJpegsFromDirectory(directory string) {
+func GenerateAll(directory string) {
 	files, err := os.ReadDir(directory)
 
 	if err != nil {
