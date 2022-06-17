@@ -19,8 +19,10 @@ type img struct {
 	squarepath   string
 	filetype     string
 	orignalimage image.Image
+	squareimage  *image.RGBA
 }
 
+// GenerateAll is generating square images for all images in a directory, that /// are not squared yet. It will overvwrite any image that was already squared.
 func GenerateAll(directory string) {
 	files, err := os.ReadDir(directory)
 
@@ -36,18 +38,15 @@ func GenerateAll(directory string) {
 				filetype:     filepath.Ext(file.Name()),
 				orignalimage: openImage(filepath.Join(directory, file.Name())),
 			}
-			createsquareimage(i)
+			if i.orignalimage.Bounds().Dx() != i.orignalimage.Bounds().Dy() {
+				i.squareimage = generatesquareimage(i.orignalimage)
+				generatenewfile(i)
+			}
 		}
 	}
 }
 
-func createsquareimage(i img) {
-
-	squareimg := generatesquareimage(i.orignalimage)
-	generatenewfile(i, squareimg)
-}
-
-func generatenewfile(i img, squareimg *image.RGBA) {
+func generatenewfile(i img) {
 	fmt.Println("Generating" + i.squarepath)
 	f, err := os.Create(i.squarepath)
 
@@ -58,9 +57,9 @@ func generatenewfile(i img, squareimg *image.RGBA) {
 	defer f.Close()
 
 	if i.filetype == ".jpeg" || i.filetype == ".jpg" {
-		jpeg.Encode(f, squareimg, &jpeg.Options{Quality: 90})
+		jpeg.Encode(f, i.squareimage, &jpeg.Options{Quality: 90})
 	} else if i.filetype == ".png" {
-		png.Encode(f, squareimg)
+		png.Encode(f, i.squareimage)
 	}
 }
 
